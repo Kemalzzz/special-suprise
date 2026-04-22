@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For My Favorite Person</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Caveat:wght@500&family=Poppins:wght@300;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root { 
+            --primary-pink: #ff85a1; 
+            --envelope-color: #ffb1c1;
+            --flap-color: #ff99ae;
+            --ribbon-red: #d00000;
+            --ink-color: #2c3e50; /* Darker ink for better reading */
+            --paper-bg: #fffdf5; 
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            background: #fff5f8;
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* --- LOGIN SCREEN --- */
+        #login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #fff5f8 0%, #ffd1dc 100%);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 2000; transition: transform 1s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+        .login-box { text-align: center; padding: 40px; background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); border-radius: 30px; box-shadow: 0 20px 50px rgba(255, 133, 161, 0.2); }
+        .login-box h2 { font-family: 'Dancing Script', cursive; font-size: 2.2rem; color: var(--primary-pink); }
+        .login-box input { padding: 12px 20px; border: 2px solid var(--primary-pink); border-radius: 50px; outline: none; text-align: center; margin-bottom: 20px; width: 200px; text-transform: uppercase; }
+        .start-btn { padding: 12px 40px; background: var(--primary-pink); color: white; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; }
+
+        /* --- MAIN INTERFACE --- */
+        #main-interface {
+            width: 100%; min-height: 100vh;
+            display: none; flex-direction: column; align-items: center;
+            padding: 60px 20px; opacity: 0; transition: opacity 1s;
+        }
+
+        #garden { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+        .flower { position: absolute; font-size: 2rem; animation: drift linear infinite; }
+
+        header { text-align: center; margin-bottom: 50px; z-index: 10; }
+        header h1 { font-family: 'Dancing Script', cursive; color: var(--primary-pink); font-size: clamp(2.5rem, 8vw, 3.5rem); margin: 0; }
+        header p { color: #888; font-style: italic; }
+
+        #card-container { 
+            display: flex; flex-wrap: wrap; justify-content: center;
+            gap: 60px 30px; width: 100%; max-width: 1200px;
+            z-index: 10; padding: 40px; margin-bottom: 100px;
+        }
+
+        /* --- ENVELOPE --- */
+        .envelope-wrapper { 
+            position: relative; width: 200px; height: 140px; 
+            perspective: 1000px; cursor: pointer;
+        }
+
+        .envelope { 
+            position: relative; width: 100%; height: 100%; 
+            background-color: var(--envelope-color); 
+            border-radius: 0 0 10px 10px; 
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1); 
+        }
+
+        .ribbon-v { position: absolute; left: 50%; transform: translateX(-50%); width: 20px; height: 100%; background: var(--ribbon-red); z-index: 2; opacity: 0.8; }
+        .ribbon-h { position: absolute; top: 50%; transform: translateY(-50%); width: 100%; height: 20px; background: var(--ribbon-red); z-index: 2; opacity: 0.8; }
+
+        .seal {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 40px; height: 40px; background: #a00000;
+            border-radius: 50%; z-index: 6; 
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+            color: white; font-size: 1.2rem; transition: 0.3s;
+        }
+
+        .flap { 
+            position: absolute; top: 0; left: 0; width: 0; height: 0; 
+            border-left: 100px solid transparent; border-right: 100px solid transparent; 
+            border-top: 75px solid var(--flap-color); 
+            transform-origin: top; transition: transform 0.4s 0.2s ease; 
+            z-index: 5;
+        }
+
+        .envelope::before {
+            content: ''; position: absolute; z-index: 4; 
+            width: 0; height: 0; 
+            border-left: 100px solid transparent; border-right: 100px solid transparent; 
+            border-bottom: 75px solid #ffc2cf; 
+            bottom: 0; left: 0; border-radius: 0 0 10px 10px; 
+        }
+
+        /* --- THE LETTER --- */
+        .letter { 
+            position: absolute; top: 5px; left: 10px; 
+            width: 180px; height: 130px; 
+            background: var(--paper-bg); 
+            border-radius: 2px; padding: 15px; box-sizing: border-box; 
+            transition: transform 0.6s 0.4s ease, height 0.6s 0.4s ease, width 0.6s 0.4s ease; 
+            z-index: 3; display: flex; align-items: center; justify-content: center; 
+            text-align: center; border: 1px solid #e0d8c0;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .letter p { 
+            font-family: 'Caveat', cursive; 
+            font-size: 1.2rem; 
+            color: var(--ink-color); 
+            opacity: 0; 
+            transition: 0.3s 0.7s; 
+            line-height: 1.2;
+            word-wrap: break-word;
+        }
+
+        /* --- OPEN STATE --- */
+        .envelope-wrapper.is-open .flap { transform: rotateX(180deg); z-index: 1; }
+        .envelope-wrapper.is-open .letter { 
+            transform: translateY(-130px) scale(1.4); 
+            height: 180px; width: 200px;
+            z-index: 100; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2); 
+        }
+        .envelope-wrapper.is-open .letter p { opacity: 1; }
+        .envelope-wrapper.is-open .seal { opacity: 0; transform: translate(-50%, -50%) scale(0); }
+
+        @keyframes drift { 0% { transform: translateY(110vh) rotate(0deg); opacity: 0; } 10% { opacity: 0.8; } 100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; } }
+        
+        #yt-player { position: absolute; width: 0; height: 0; opacity: 0; pointer-events: none; }
+    </style>
+</head>
+<body>
+
+    <div id="yt-player"></div>
+
+    <div id="login-screen">
+        <div class="login-box">
+            <h2>Hey Sayang... ✨</h2>
+            <input type="text" id="passInput" placeholder="PASSWORD">
+            <br>
+            <button class="start-btn" onclick="checkPassword()">Open Your Heart ❤️</button>
+        </div>
+    </div>
+
+    <div id="main-interface">
+        <div id="garden"></div>
+        <header>
+            <h1>Happy 19th, Aqilah! 🎂</h1>
+            <p>I wrote a few things down for you...</p>
+        </header>
+        <div id="card-container"></div>
+    </div>
+
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+        let player;
+        const password = "SAYANG"; 
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('yt-player', {
+                height: '0', width: '0', videoId: 'ordTyLV0VfE',
+                playerVars: { 'autoplay': 0, 'loop': 1, 'playlist': 'ordTyLV0VfE' },
+                events: { 'onReady': (e) => e.target.setVolume(100) }
+            });
+        }
+
+        function checkPassword() {
+            const val = document.getElementById('passInput').value.toUpperCase();
+            if (val === password) {
+                if (player) player.playVideo();
+                document.getElementById('login-screen').style.transform = "translateY(-100%)";
+                const main = document.getElementById('main-interface');
+                main.style.display = "flex";
+                setTimeout(() => { main.style.opacity = "1"; startGarden(); }, 500);
+            } else { alert("Wrong password, try again Sayang! ❤️"); }
+        }
+
+        function startGarden() {
+            const garden = document.getElementById('garden');
+            const icons = ['🌸', '✨', '💖', '🌹', '☁️'];
+            setInterval(() => {
+                const f = document.createElement('div');
+                f.className = 'flower';
+                f.innerText = icons[Math.floor(Math.random() * icons.length)];
+                f.style.left = Math.random() * 100 + 'vw';
+                const dur = Math.random() * 5 + 10;
+                f.style.animationDuration = dur + 's';
+                garden.appendChild(f);
+                setTimeout(() => f.remove(), dur * 1000);
+            }, 800);
+        }
+
+        const humanMessages = [
+            "Happy 19th birthday! Watching you grow up is my favorite thing to do. I’m so proud of you.",
+            "Sayang, thank you for being the one person who always gets my weird jokes. You’re home to me.",
+            "I know 19 can feel big and scary, but you’re doing so well. I'll be right behind you the whole way.",
+            "Aqilah, your smile literally changes my whole day. Please never stop sharing it with me.",
+            "I promise to always be the person who stays, even when things get 'dry' or difficult. We're a team.",
+            "You are more beautiful than you give yourself credit for. I wish you could see yourself through my eyes.",
+            "Thank you for choosing me. I know I’m not perfect, but I’ll always try my best for you.",
+            "I love our late night talks and even our silences. Being with you is just... easy.",
+            "To the girl who holds my heart, I hope this year brings you all the peace you deserve.",
+            "Happy Birthday! 19 looks amazing on you. But then again, everything looks amazing on you.",
+            "I’m so lucky I get to call you mine. I don’t take a single second of it for granted.",
+            "You’re my favorite distraction. I could spend all day just talking to you.",
+            "Thank you for being patient with me. You’ve taught me so much about love.",
+            "Whatever dreams you have for this year, I’m your #1 fan. Go get them, sayang!",
+            "I love you more than words can actually explain. This website is just a small start.",
+            "You're the person I want to share every good news with first. Always.",
+            "Don't ever doubt yourself. You are smart, capable, and so incredibly kind.",
+            "I hope 19 is the year all your hard work starts paying off. You deserve the world.",
+            "19 letters isn't nearly enough to tell you how I feel, but I’ll spend the rest of my life showing you. ❤️"
+        ];
+
+        const container = document.getElementById('card-container');
+        humanMessages.forEach((msg) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'envelope-wrapper';
+            const rot = (Math.random() * 16 - 8).toFixed(2);
+            wrapper.style.transform = `rotate(${rot}deg)`;
+
+            wrapper.innerHTML = `
+                <div class="envelope">
+                    <div class="ribbon-v"></div>
+                    <div class="ribbon-h"></div>
+                    <div class="seal">❤️</div>
+                    <div class="flap"></div>
+                    <div class="letter"><p>${msg}</p></div>
+                </div>
+            `;
+            wrapper.addEventListener('click', () => {
+                wrapper.classList.toggle('is-open');
+                wrapper.style.zIndex = wrapper.classList.contains('is-open') ? "200" : "1";
+            });
+            container.appendChild(wrapper);
+        });
+    </script>
+</body>
+</html>
