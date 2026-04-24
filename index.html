@@ -12,7 +12,7 @@
             --envelope-color: #ffb1c1;
             --flap-color: #ff99ae;
             --ribbon-red: #d00000;
-            --ink-color: #2c3e50; /* Darker ink for better reading */
+            --ink-color: #2c3e50;
             --paper-bg: #fffdf5; 
         }
 
@@ -43,17 +43,43 @@
             padding: 60px 20px; opacity: 0; transition: opacity 1s;
         }
 
+        /* PHOTO GARDEN BACKGROUND */
         #garden { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
-        .flower { position: absolute; font-size: 2rem; animation: drift linear infinite; }
+        
+        .photo-frame {
+            position: absolute;
+            background: white;
+            padding: 8px 8px 25px 8px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            border-radius: 2px;
+            width: 120px; /* Adjust size of background photos */
+            opacity: 0;
+            animation: floatUp linear infinite;
+        }
 
-        header { text-align: center; margin-bottom: 50px; z-index: 10; }
-        header h1 { font-family: 'Dancing Script', cursive; color: var(--primary-pink); font-size: clamp(2.5rem, 8vw, 3.5rem); margin: 0; }
+        .photo-frame img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 1px;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.7; }
+            90% { opacity: 0.7; }
+            100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; }
+        }
+
+        header { text-align: center; margin-bottom: 50px; z-index: 10; position: relative; }
+        header h1 { font-family: 'Dancing Script', cursive; color: var(--primary-pink); font-size: clamp(2.5rem, 8vw, 3.5rem); margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.05); }
         header p { color: #888; font-style: italic; }
 
         #card-container { 
             display: flex; flex-wrap: wrap; justify-content: center;
             gap: 60px 30px; width: 100%; max-width: 1200px;
             z-index: 10; padding: 40px; margin-bottom: 100px;
+            position: relative;
         }
 
         /* --- ENVELOPE --- */
@@ -117,6 +143,7 @@
             transition: 0.3s 0.7s; 
             line-height: 1.2;
             word-wrap: break-word;
+            margin: 0;
         }
 
         /* --- OPEN STATE --- */
@@ -130,8 +157,6 @@
         .envelope-wrapper.is-open .letter p { opacity: 1; }
         .envelope-wrapper.is-open .seal { opacity: 0; transform: translate(-50%, -50%) scale(0); }
 
-        @keyframes drift { 0% { transform: translateY(110vh) rotate(0deg); opacity: 0; } 10% { opacity: 0.8; } 100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; } }
-        
         #yt-player { position: absolute; width: 0; height: 0; opacity: 0; pointer-events: none; }
     </style>
 </head>
@@ -162,6 +187,20 @@
         let player;
         const password = "SAYANG"; 
 
+        // --- ADD YOUR 10 PHOTO LINKS HERE ---
+        const photoUrls = [
+            'https://i.imgur.com/vBDAd1k.jpeg',
+            'https://i.imgur.com/oLYUS3T.jpeg',
+            'https://i.imgur.com/Dhmbsno.jpeg',
+            'https://i.imgur.com/xtYieVi.jpeg',
+            'https://i.imgur.com/94YJocL.jpeg',
+            'https://i.imgur.com/50Eab0y.jpeg',
+            'https://i.imgur.com/zPNoTKi.jpeg',
+            'https://i.imgur.com/P0kUttS.jpeg',
+            'https://i.imgur.com/yJ7ZIO4.jpeg',
+            'https://i.imgur.com/7V5AQj1.jpeg'
+        ];
+
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('yt-player', {
                 height: '0', width: '0', videoId: 'ordTyLV0VfE',
@@ -183,39 +222,50 @@
 
         function startGarden() {
             const garden = document.getElementById('garden');
-            const icons = ['🌸', '✨', '💖', '🌹', '☁️'];
+            let photoIdx = 0;
+
             setInterval(() => {
-                const f = document.createElement('div');
-                f.className = 'flower';
-                f.innerText = icons[Math.floor(Math.random() * icons.length)];
-                f.style.left = Math.random() * 100 + 'vw';
-                const dur = Math.random() * 5 + 10;
-                f.style.animationDuration = dur + 's';
-                garden.appendChild(f);
-                setTimeout(() => f.remove(), dur * 1000);
-            }, 800);
+                const frame = document.createElement('div');
+                frame.className = 'photo-frame';
+                
+                // Use original photo link from array
+                const img = document.createElement('img');
+                img.src = photoUrls[photoIdx % photoUrls.length];
+                frame.appendChild(img);
+                
+                photoIdx++;
+
+                // Random positioning
+                frame.style.left = Math.random() * 90 + 'vw';
+                const dur = Math.random() * 5 + 15; // Slow float
+                frame.style.animationDuration = dur + 's';
+                frame.style.transform = `rotate(${Math.random() * 40 - 20}deg)`;
+
+                garden.appendChild(frame);
+                setTimeout(() => frame.remove(), dur * 1000);
+            }, 3500); // New photo every 3.5 seconds
         }
 
         const humanMessages = [
-            "Happy 19th birthday! Watching you grow up is my favorite thing to do. I’m so proud of you.",
-            "Sayang, thank you for being the one person who always gets my weird jokes. You’re home to me.",
-            "I know 19 can feel big and scary, but you’re doing so well. I'll be right behind you the whole way.",
-            "Aqilah, your smile literally changes my whole day. Please never stop sharing it with me.",
-            "I promise to always be the person who stays, even when things get 'dry' or difficult. We're a team.",
-            "You are more beautiful than you give yourself credit for. I wish you could see yourself through my eyes.",
-            "Thank you for choosing me. I know I’m not perfect, but I’ll always try my best for you.",
-            "I love our late night talks and even our silences. Being with you is just... easy.",
-            "To the girl who holds my heart, I hope this year brings you all the peace you deserve.",
-            "Happy Birthday! 19 looks amazing on you. But then again, everything looks amazing on you.",
-            "I’m so lucky I get to call you mine. I don’t take a single second of it for granted.",
-            "You’re my favorite distraction. I could spend all day just talking to you.",
-            "Thank you for being patient with me. You’ve taught me so much about love.",
-            "Whatever dreams you have for this year, I’m your #1 fan. Go get them, sayang!",
-            "I love you more than words can actually explain. This website is just a small start.",
-            "You're the person I want to share every good news with first. Always.",
-            "Don't ever doubt yourself. You are smart, capable, and so incredibly kind.",
-            "I hope 19 is the year all your hard work starts paying off. You deserve the world.",
-            "19 letters isn't nearly enough to tell you how I feel, but I’ll spend the rest of my life showing you. ❤️"
+            "Happy 19th birthday! Watching you grow up is my favorite thing to do.",
+            "Sayang, thank you for being the one person who always gets my weird jokes.",
+            "I know 19 can feel big and scary, but you’re doing so well. I'm right here.",
+            "Aqilah, your smile literally changes my whole day. Please never stop.",
+            "I promise to always be the person who stays, even when things get dry.",
+            "You are more beautiful than you give yourself credit for.",
+            "Thank you for choosing me. I’ll always try my best for you.",
+            "I love our late night talks and even our silences. Being with you is easy.",
+            "To the girl who holds my heart, I hope this year brings you peace.",
+            "Happy Birthday! 19 looks amazing on you. You're stunning.",
+            "I’m so lucky I get to call you mine. I don't take it for granted.",
+            "You’re my favorite distraction. I could spend all day talking to you.",
+            "Thank you for being patient with me. You’ve taught me so much.",
+            "Whatever dreams you have for this year, I’m your #1 fan.",
+            "I love you more than words can actually explain. Always.",
+            "You're the person I want to share every good news with first.",
+            "Don't ever doubt yourself. You are smart, capable, and so kind.",
+            "I hope 19 is the year all your hard work starts paying off.",
+            "19 letters isn't enough, but I’ll spend life showing you. ❤️"
         ];
 
         const container = document.getElementById('card-container');
